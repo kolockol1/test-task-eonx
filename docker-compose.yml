@@ -13,6 +13,8 @@ services:
   api-php-fpm:
     build:
       context: config/dev/php-fpm
+    environment:
+      PHP_IDE_CONFIG: serverName=API
     volumes:
       - ./:/app
 
