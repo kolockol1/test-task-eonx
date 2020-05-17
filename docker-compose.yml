@@ -26,7 +26,10 @@ services:
       - ./:/app
 
   api-postgres:
+    build:
+      context: config/dev/postgres
     image: postgres:12.2-alpine
+    restart: always
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: secret
