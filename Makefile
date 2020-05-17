@@ -1,7 +1,7 @@
-init: docker-down-clear docker-pull docker-build docker-up
-up: docker-up
+init: docker-down-clear docker-pull docker-build docker-up composer-install
+up: docker-up composer-install
 down: docker-down
-restart: down up
+restart: down up composer-install
 
 docker-up:
 	docker-compose up -d
@@ -17,3 +17,6 @@ docker-down-clear:
 
 docker-build:
 	docker-compose build
+
+composer-install:
+	docker-compose run --rm api-php-cli composer install
