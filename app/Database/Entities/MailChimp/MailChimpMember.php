@@ -5,6 +5,9 @@ namespace App\Database\Entities\MailChimp;
 use Doctrine\ORM\Mapping as ORM;
 use EoneoPay\Utils\Str;
 
+/**
+ * @ORM\Entity()
+ */
 class MailChimpMember extends MailChimpEntity
 {
     /**
