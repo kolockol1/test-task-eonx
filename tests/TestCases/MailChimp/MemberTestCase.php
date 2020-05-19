@@ -27,6 +27,21 @@ abstract class MemberTestCase extends ListTestCase
         'tags' => [],
     ];
 
+    protected static $notRequiredForMember = [
+        'email_type',
+        'merge_fields',
+        'interests',
+        'language',
+        'vip',
+        'location',
+        'marketing_permissions',
+        'ip_signup',
+        'timestamp_signup',
+        'ip_opt',
+        'timestamp_opt',
+        'tags',
+    ];
+
     /**
      * Create MailChimp list into database.
      *
