@@ -8,6 +8,7 @@ use App\Database\Entities\MailChimp\MailChimpMember;
 use App\Database\Exceptions\MailChimpListNotFoundException;
 use App\Http\Controllers\Controller;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Mailchimp\Mailchimp;
@@ -68,7 +69,7 @@ class MembersController extends Controller
             $response = $this->mailChimp->post('lists/' . $list->getMailChimpId() . '/members', $member->toMailChimpArray());
             // Set MailChimp id on the member and save it into db
             $this->saveEntity($member->setMailChimpId($response->get('id')));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             // Return error response if something goes wrong
             return $this->errorResponse(['message' => $exception->getMessage()]);
         }
@@ -90,17 +91,45 @@ class MembersController extends Controller
         if (!($list instanceof MailChimpList)) {
             return $this->getErrorResponseForListNotFound($listId);
         }
-        /** @var MailChimpMember|null $member */
-        $member = $this->entityManager->getRepository(MailChimpMember::class)->find($memberId);
 
-        if ($member === null) {
-            return $this->errorResponse(
-                ['message' => \sprintf('MailChimpMember[%s] not found', $memberId)],
-                404
-            );
+        $member = $this->entityManager->getRepository(MailChimpMember::class)->find($memberId);
+        if (!($member instanceof MailChimpMember)) {
+            return $this->getErrorResponseForMemberNotFound($memberId);
         }
 
         return $this->successfulResponse($member->toArray());
+    }
+
+    /**
+     * Remove MailChimp member.
+     *
+     * @param string $listId
+     * @param string $memberId
+     *
+     * @return JsonResponse
+     */
+    public function remove(string $listId, string $memberId): JsonResponse
+    {
+        $list = $this->getListById($listId);
+        if (!($list instanceof MailChimpList)) {
+            return $this->getErrorResponseForListNotFound($listId);
+        }
+
+        $member = $this->entityManager->getRepository(MailChimpMember::class)->find($memberId);
+        if (!($member instanceof MailChimpMember)) {
+            return $this->getErrorResponseForMemberNotFound($memberId);
+        }
+
+        try {
+            // Remove member from database
+            $this->removeEntity($member);
+            // Remove member from MailChimp
+            $this->mailChimp->delete(\sprintf('lists/%s/members/%s', $list->getMailChimpId(), $member->getMailChimpId()));
+        } catch (Exception $exception) {
+            return $this->errorResponse(['message' => $exception->getMessage()]);
+        }
+
+        return $this->successfulResponse([]);
     }
 
     /**
@@ -122,6 +151,19 @@ class MembersController extends Controller
     {
         return $this->errorResponse(
             ['message' => \sprintf('MailChimpList[%s] not found', $listId)],
+            404
+        );
+    }
+
+    /**
+     * @param string $memberId
+     *
+     * @return JsonResponse
+     */
+    private function getErrorResponseForMemberNotFound(string $memberId): JsonResponse
+    {
+        return $this->errorResponse(
+            ['message' => \sprintf('MailChimpMember[%s] not found', $memberId)],
             404
         );
     }
