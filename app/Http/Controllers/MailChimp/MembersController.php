@@ -5,7 +5,6 @@ namespace App\Http\Controllers\MailChimp;
 
 use App\Database\Entities\MailChimp\MailChimpList;
 use App\Database\Entities\MailChimp\MailChimpMember;
-use App\Database\Exceptions\MailChimpListNotFoundException;
 use App\Http\Controllers\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

@@ -132,7 +132,6 @@ class MemberControllerTest extends MemberTestCase
         self::assertEmpty(\json_decode($this->response->content(), true));
     }
 
-
     /**
      * Test application returns error response when member not found.
      *
@@ -181,6 +180,51 @@ class MemberControllerTest extends MemberTestCase
             self::assertArrayHasKey($key, $afterUpdateMemberContent);
         }
         self::assertTrue($afterUpdateMemberContent['vip']);
+    }
+
+    /**
+     * Test application returns error response when member not found.
+     *
+     * @return void
+     */
+    public function testUpdateMemberNotFoundException(): void
+    {
+        $listContent = $this->generateList();
+        $this->put(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], 'invalid-member-id'));
+
+        $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+    /**
+     * Test application returns error response for MembersController::show endpoint when list not found.
+     *
+     * @return void
+     */
+    public function testUpdateListForMemberNotFoundException(): void
+    {
+        $this->put(\sprintf('/mailchimp/lists/%s/members/%s', 'invalid-list-id', 'invalid-member-id'));
+
+        $this->assertListNotFoundResponse('invalid-list-id');
+    }
+
+    public function testUpdateMemberWithInvalidData(): void
+    {
+        $listContent = $this->generateList();
+
+        $this->post(\sprintf('/mailchimp/lists/%s/members', $listContent['list_id']), static::$memberData);
+        $memberContent = \json_decode($this->response->getContent(), true);
+
+        $this->addCreatedMember($listContent['mail_chimp_id'], $memberContent['mail_chimp_id']);
+
+        $this->put(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], $memberContent['member_id']), ['status' => 'orange']);
+        $afterUpdateMemberContent = \json_decode($this->response->content(), true);
+
+        $this->assertResponseStatus(400);
+        self::assertArrayHasKey('message', $afterUpdateMemberContent);
+        self::assertEquals('Invalid data given', $afterUpdateMemberContent['message']);
+        self::assertArrayHasKey('errors', $afterUpdateMemberContent);
+        self::assertArrayHasKey('status', $afterUpdateMemberContent['errors']);
+        self::assertContains('The selected status is invalid.', $afterUpdateMemberContent['errors']['status']);
     }
 
     /**
