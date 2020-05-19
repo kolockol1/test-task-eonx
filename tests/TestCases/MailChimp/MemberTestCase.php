@@ -23,6 +23,18 @@ abstract class MemberTestCase extends ListTestCase
         parent::tearDown();
     }
 
+    /**
+     * @return array
+     */
+    protected function generateList(): array
+    {
+        $this->post('/mailchimp/lists', static::$listData);
+        $listContent = \json_decode($this->response->getContent(), true);
+        $this->createdListIds[] = $listContent['mail_chimp_id'];
+
+        return $listContent;
+    }
+
     protected function addCreatedMember(string $listId, string $memberId): void
     {
         $this->createdMembers[] = [

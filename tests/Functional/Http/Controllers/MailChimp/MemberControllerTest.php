@@ -226,16 +226,4 @@ class MemberControllerTest extends MemberTestCase
         self::assertArrayHasKey('status', $afterUpdateMemberContent['errors']);
         self::assertContains('The selected status is invalid.', $afterUpdateMemberContent['errors']['status']);
     }
-
-    /**
-     * @return array
-     */
-    private function generateList(): array
-    {
-        $this->post('/mailchimp/lists', static::$listData);
-        $listContent = \json_decode($this->response->getContent(), true);
-        $this->createdListIds[] = $listContent['mail_chimp_id'];
-
-        return $listContent;
-    }
 }
