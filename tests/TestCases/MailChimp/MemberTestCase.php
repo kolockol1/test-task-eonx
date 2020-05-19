@@ -10,6 +10,19 @@ abstract class MemberTestCase extends ListTestCase
 {
     protected $createdMembers = [];
 
+    public function tearDown(): void
+    {
+        /** @var Mailchimp $mailChimp */
+        $mailChimp = $this->app->make(Mailchimp::class);
+
+        foreach ($this->createdMembers as $member) {
+            // Delete members on MailChimp after test
+            $mailChimp->delete(\sprintf('lists/%s/members/%s', $member['listId'], $member['memberId']));
+        }
+
+        parent::tearDown();
+    }
+
     protected static $memberData = [
         'email_address' => 'techTask@enjoy.com',
         'email_type' => 'text',
@@ -43,7 +56,7 @@ abstract class MemberTestCase extends ListTestCase
     ];
 
     /**
-     * Create MailChimp list into database.
+     * Create MailChimp member into database.
      *
      * @param array $data
      *
@@ -59,16 +72,19 @@ abstract class MemberTestCase extends ListTestCase
         return $member;
     }
 
-    public function tearDown(): void
+    /**
+     * Asserts error response when member not found.
+     *
+     * @param string $memberId
+     *
+     * @return void
+     */
+    protected function assertMemberNotFoundResponse(string $memberId): void
     {
-        /** @var Mailchimp $mailChimp */
-        $mailChimp = $this->app->make(Mailchimp::class);
+        $content = \json_decode($this->response->content(), true);
 
-        foreach ($this->createdMembers as $member) {
-            // Delete members on MailChimp after test
-            $mailChimp->delete(\sprintf('lists/%s/members/%s', $member['listId'], $member['memberId']));
-        }
-
-        parent::tearDown();
+        $this->assertResponseStatus(404);
+        self::assertArrayHasKey('message', $content);
+        self::assertEquals(\sprintf('MailChimpMember[%s] not found', $memberId), $content['message']);
     }
 }

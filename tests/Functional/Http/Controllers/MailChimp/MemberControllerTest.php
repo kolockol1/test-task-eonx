@@ -76,6 +76,19 @@ class MemberControllerTest extends MemberTestCase
     }
 
     /**
+     * Test application returns error response when member not found.
+     *
+     * @return void
+     */
+    public function testShowMemberNotFoundException(): void
+    {
+        $listContent = $this->generateList();
+        $this->get(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], 'invalid-member-id'));
+
+        $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+    /**
      * @return array
      */
     private function generateList(): array
