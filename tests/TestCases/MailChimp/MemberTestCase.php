@@ -11,25 +11,19 @@ abstract class MemberTestCase extends ListTestCase
     protected $createdMembers = [];
 
     protected static $memberData = [
-        'email_address' => 'test@test.com',
+        'email_address' => 'techTask@enjoy.com',
         'email_type' => 'text',
-        'status' => 'subscribed',
-        'merge_fields' => [],
-        'interests' => [],
+        'status' => 'unsubscribed',
         'language' => 'ru',
         'vip' => false,
         'location' => [
-            'latitude' => 55.55,
-            'longitude' => 44.44,
-        ],
-        'marketing_permissions' => [
-            'marketing_permission_id' => '123',
-            'enabled' => true,
+            'latitude' => '55.55',
+            'longitude' => '44.44',
         ],
         'ip_signup' => '1.1.1.1',
-        'timestamp_signup' => '1589827748',
+        'timestamp_signup' => '2020-11-05T08:15:30-05:00',
         'ip_opt' => '2.2.2.2',
-        'timestamp_opt' => '1589827749',
+        'timestamp_opt' => '2020-11-05T08:15:30-05:00',
         'tags' => [],
     ];
 

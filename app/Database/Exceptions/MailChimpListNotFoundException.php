@@ -7,5 +7,8 @@ use App\Exceptions\AbstractApiException;
 
 class MailChimpListNotFoundException extends AbstractApiException
 {
-    //
+    public static function notFoundInDatabase(string $listId): self
+    {
+        return new self('list #' . $listId . ' not found in DB');
+    }
 }

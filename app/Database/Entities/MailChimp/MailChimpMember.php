@@ -138,8 +138,8 @@ class MailChimpMember extends MailChimpEntity
             'language' => 'nullable|string',
             'vip' => 'nullable|boolean',
             'location' => 'nullable|array',
-            'location.latitude' => 'nullable|decimal',
-            'location.longitude' => 'nullable|decimal',
+            'location.latitude' => 'nullable|string', // todo change string to decimal|double
+            'location.longitude' => 'nullable|string', // todo change string to decimal|double
             'marketing_permissions' => 'nullable|array',
             'marketing_permissions.marketing_permission_id' => 'nullable|string',
             'marketing_permissions.enabled' => 'nullable|boolean',
@@ -164,5 +164,205 @@ class MailChimpMember extends MailChimpEntity
         }
 
         return $array;
+    }
+
+    /**
+     * @param string $mailChimpId
+     *
+     * @return $this
+     */
+    public function setMailChimpId(string $mailChimpId): self
+    {
+        $this->mailChimpId = $mailChimpId;
+
+        return $this;
+    }
+
+    /**
+     * @param string $emailAddress
+     *
+     * @return $this
+     */
+    public function setEmailAddress(string $emailAddress): self
+    {
+        $this->emailAddress = $emailAddress;
+
+        return $this;
+    }
+
+    /**
+     * @param string $emailType
+     *
+     * @return $this
+     */
+    public function setEmailType(string $emailType): self
+    {
+        $this->emailType = $emailType;
+
+        return $this;
+    }
+
+    /**
+     * @param string $status
+     *
+     * @return $this
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @param array $mergeFields
+     *
+     * @return $this
+     */
+    public function setMergeFields(array $mergeFields): self
+    {
+        $this->mergeFields = $mergeFields;
+
+        return $this;
+    }
+
+    /**
+     * @param array $interests
+     *
+     * @return $this
+     */
+    public function setInterests(array $interests): self
+    {
+        $this->interests = $interests;
+
+        return $this;
+    }
+
+    /**
+     * @param string $language
+     *
+     * @return $this
+     */
+    public function setLanguage(string $language): self
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $vip
+     *
+     * @return $this
+     */
+    public function setVip(bool $vip): self
+    {
+        $this->vip = $vip;
+
+        return $this;
+    }
+
+    /**
+     * @param array $location
+     *
+     * @return $this
+     */
+    public function setLocation(array $location): self
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * @param array $marketingPermissions
+     *
+     * @return $this
+     */
+    public function setMarketingPermissions(array $marketingPermissions): self
+    {
+        $this->marketingPermissions = $marketingPermissions;
+
+        return $this;
+    }
+
+    /**
+     * @param string $ipSignup
+     *
+     * @return $this
+     */
+    public function setIpSignup(string $ipSignup): self
+    {
+        $this->ipSignup = $ipSignup;
+
+        return $this;
+    }
+
+    /**
+     * @param string $timestampSignup
+     *
+     * @return $this
+     */
+    public function setTimestampSignup(string $timestampSignup): self
+    {
+        $this->timestampSignup = $timestampSignup;
+
+        return $this;
+    }
+
+    /**
+     * @param string $ipOpt
+     *
+     * @return $this
+     */
+    public function setIpOpt(string $ipOpt): self
+    {
+        $this->ipOpt = $ipOpt;
+
+        return $this;
+    }
+
+    /**
+     * @param string $timestampOpt
+     *
+     * @return $this
+     */
+    public function setTimestampOpt(string $timestampOpt): self
+    {
+        $this->timestampOpt = $timestampOpt;
+
+        return $this;
+    }
+
+    /**
+     * @param array $tags
+     *
+     * @return $this
+     */
+    public function setTags(array $tags): self
+    {
+        $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * @param string $memberId
+     *
+     * @return $this
+     */
+    public function setMemberId(string $memberId): self
+    {
+        $this->memberId = $memberId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->memberId;
     }
 }

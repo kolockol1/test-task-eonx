@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Functional\Http\Controllers\MailChimp;
 
-
 use Tests\App\TestCases\MailChimp\MemberTestCase;
 
 class MemberControllerTest extends MemberTestCase
@@ -13,19 +12,20 @@ class MemberControllerTest extends MemberTestCase
      *
      * @return void
      */
-    public function testCreateListSuccessfully(): void
+    public function testCreateMemberSuccessfully(): void
     {
-        $list = $this->createList(static::$listData);
-        $member = $this->createMember(static::$memberData);
+        // create list
+        $this->post('/mailchimp/lists', static::$listData);
+        $listContent = \json_decode($this->response->getContent(), true);
+        $this->createdListIds[] = $listContent['mail_chimp_id'];
 
-        $this->get(\sprintf('/mailchimp/lists/%s/members/%s', $list->getId(), $member->getId()));
-        $content = \json_decode($this->response->content(), true);
+        // create member, by list_id
+        $this->post(\sprintf('/mailchimp/lists/%s/members', $listContent['list_id']), static::$memberData);
+        $memberContent = \json_decode($this->response->getContent(), true);
 
         $this->assertResponseOk();
-
-        foreach (static::$memberData as $key => $value) {
-            self::assertArrayHasKey($key, $content);
-            self::assertEquals($value, $content[$key]);
-        }
+        $this->seeJson(static::$memberData);
+        self::assertArrayHasKey('mail_chimp_id', $memberContent);
+        self::assertNotNull($memberContent['mail_chimp_id']);
     }
 }

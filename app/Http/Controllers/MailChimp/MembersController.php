@@ -3,21 +3,92 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\MailChimp;
 
+use App\Database\Entities\MailChimp\MailChimpList;
+use App\Database\Entities\MailChimp\MailChimpMember;
+use App\Database\Exceptions\MailChimpListNotFoundException;
 use App\Http\Controllers\Controller;
+use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Mailchimp\Mailchimp;
 
 class MembersController extends Controller
 {
     /**
+     * @var Mailchimp
+     */
+    private $mailChimp;
+
+    /**
+     * MembersController constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param Mailchimp $mailchimp
+     */
+    public function __construct(EntityManagerInterface $entityManager, Mailchimp $mailchimp)
+    {
+        parent::__construct($entityManager);
+
+        $this->mailChimp = $mailchimp;
+    }
+
+    /**
      * Create MailChimp member
      *
      * @param Request $request
+     * @param string $listId
      *
      * @return JsonResponse
+     *
+     * @throws MailChimpListNotFoundException
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, string $listId): JsonResponse
     {
+        $list = $this->getListById($listId);
+        // Instantiate entity
+        $member = new MailChimpMember($request->all());
+        // Validate entity
+        $validator = $this->getValidationFactory()->make($member->toMailChimpArray(), $member->getValidationRules());
 
+        if ($validator->fails()) {
+            // Return error response if validation failed
+            return $this->errorResponse(
+                [
+                    'message' => 'Invalid data given',
+                    'errors' => $validator->errors()->toArray()
+                ]
+            );
+        }
+
+        try {
+            // Save member into db
+            $this->saveEntity($member);
+            // Save member into MailChimp
+            $response = $this->mailChimp->post('lists/' . $list->getMailChimpId() . '/members', $member->toMailChimpArray());
+            // Set MailChimp id on the member and save it into db
+            $this->saveEntity($member->setMailChimpId($response->get('id')));
+        } catch (\Exception $exception) {
+            // Return error response if something goes wrong
+            return $this->errorResponse(['message' => $exception->getMessage()]);
+        }
+
+        return $this->successfulResponse($member->toArray());
+    }
+
+    /**
+     * @param string $listId
+     *
+     * @return MailChimpList
+     *
+     * @throws MailChimpListNotFoundException
+     */
+    private function getListById(string $listId): MailChimpList
+    {
+        $list = $this->entityManager->getRepository(MailChimpList::class)->find($listId);
+        if ($list === null) {
+            throw MailChimpListNotFoundException::notFoundInDatabase($listId);
+        }
+
+        return $list;
     }
 }
