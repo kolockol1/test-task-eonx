@@ -37,7 +37,6 @@ class MemberControllerTest extends MemberTestCase
 
         // create member, by list_id
         $this->post(\sprintf('/mailchimp/lists/%s/members', $listContent['list_id']));
-
         $content = \json_decode($this->response->getContent(), true);
 
         $this->assertResponseStatus(400);
@@ -111,6 +110,24 @@ class MemberControllerTest extends MemberTestCase
         $this->get(\sprintf('/mailchimp/lists/%s/members/%s', 'invalid-list-id', 'invalid-member-id'));
 
         $this->assertListNotFoundResponse('invalid-list-id');
+    }
+
+    /**
+     * Test application returns empty successful response when removing existing member.
+     *
+     * @return void
+     */
+    public function testRemoveMemberSuccessfully(): void
+    {
+        $listContent = $this->generateList();
+
+        $this->post(\sprintf('/mailchimp/lists/%s/members', $listContent['list_id']), static::$memberData);
+        $memberContent = \json_decode($this->response->getContent(), true);
+
+        $this->delete(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], $memberContent['member_id']));
+
+        $this->assertResponseOk();
+        self::assertEmpty(\json_decode($this->response->content(), true));
     }
 
     /**
