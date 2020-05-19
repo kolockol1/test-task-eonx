@@ -355,18 +355,6 @@ class MailChimpMember extends MailChimpEntity
     }
 
     /**
-     * @param string $memberId
-     *
-     * @return $this
-     */
-    public function setMemberId(string $memberId): self
-    {
-        $this->memberId = $memberId;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getId(): string

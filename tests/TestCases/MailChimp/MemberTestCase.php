@@ -47,6 +47,12 @@ abstract class MemberTestCase extends ListTestCase
         'email_address' => 'techTask@enjoy.com',
         'email_type' => 'text',
         'status' => 'unsubscribed',
+        'merge_fields' => ['cc' => 'aa'],
+//        'interests' => [], todo add after implementation of interest-categories
+//        'marketing_permissions' => [
+//            'marketing_permission_id' => 'asd',
+//            'enabled' => true,
+//        ],
         'language' => 'ru',
         'vip' => false,
         'location' => [
