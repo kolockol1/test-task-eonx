@@ -130,6 +130,32 @@ class MemberControllerTest extends MemberTestCase
         self::assertEmpty(\json_decode($this->response->content(), true));
     }
 
+
+    /**
+     * Test application returns error response when member not found.
+     *
+     * @return void
+     */
+    public function testRemoveMemberNotFoundException(): void
+    {
+        $listContent = $this->generateList();
+        $this->delete(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], 'invalid-member-id'));
+
+        $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+    /**
+     * Test application returns error response for MembersController::show endpoint when list not found.
+     *
+     * @return void
+     */
+    public function testRemoveListForMemberNotFoundException(): void
+    {
+        $this->delete(\sprintf('/mailchimp/lists/%s/members/%s', 'invalid-list-id', 'invalid-member-id'));
+
+        $this->assertListNotFoundResponse('invalid-list-id');
+    }
+
     /**
      * @return array
      */
