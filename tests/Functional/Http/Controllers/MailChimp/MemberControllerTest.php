@@ -55,6 +55,19 @@ class MemberControllerTest extends MemberTestCase
     }
 
     /**
+     * Test application returns error response for MembersController::create endpoint when list not found.
+     *
+     * @return void
+     */
+    public function testCreateListForMemberNotFoundException(): void
+    {
+        $this->post(\sprintf('/mailchimp/lists/%s/members','invalid-list-id'));
+
+        $this->assertListNotFoundResponse('invalid-list-id');
+    }
+
+
+    /**
      * Test application returns successful response with specific member data in list.
      *
      * @return void
@@ -86,6 +99,18 @@ class MemberControllerTest extends MemberTestCase
         $this->get(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], 'invalid-member-id'));
 
         $this->assertMemberNotFoundResponse('invalid-member-id');
+    }
+
+    /**
+     * Test application returns error response for MembersController::show endpoint when list not found.
+     *
+     * @return void
+     */
+    public function testShowListForMemberNotFoundException(): void
+    {
+        $this->get(\sprintf('/mailchimp/lists/%s/members/%s', 'invalid-list-id', 'invalid-member-id'));
+
+        $this->assertListNotFoundResponse('invalid-list-id');
     }
 
     /**
