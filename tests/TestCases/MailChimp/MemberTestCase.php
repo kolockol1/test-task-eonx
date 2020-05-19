@@ -8,7 +8,7 @@ use Mailchimp\Mailchimp;
 
 abstract class MemberTestCase extends ListTestCase
 {
-    protected $createdMembers = [];
+    private $createdMembers = [];
 
     public function tearDown(): void
     {
@@ -21,6 +21,14 @@ abstract class MemberTestCase extends ListTestCase
         }
 
         parent::tearDown();
+    }
+
+    protected function addCreatedMember(string $listId, string $memberId): void
+    {
+        $this->createdMembers[] = [
+            'listId' => $listId,
+            'memberId' => $memberId,
+        ];
     }
 
     protected static $memberData = [
