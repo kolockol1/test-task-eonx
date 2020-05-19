@@ -14,7 +14,6 @@ class MemberControllerTest extends MemberTestCase
      */
     public function testCreateMemberSuccessfully(): void
     {
-        // create list
         $listContent = $this->generateList();
 
         // create member, by list_id
@@ -34,7 +33,6 @@ class MemberControllerTest extends MemberTestCase
      */
     public function testCreateMemberValidationFailed(): void
     {
-        // create list
         $listContent = $this->generateList();
 
         // create member, by list_id
@@ -53,6 +51,27 @@ class MemberControllerTest extends MemberTestCase
             }
 
             self::assertArrayHasKey($key, $content['errors']);
+        }
+    }
+
+    /**
+     * Test application returns successful response with specific member data in list.
+     *
+     * @return void
+     */
+    public function testShowMemberSuccessfully(): void
+    {
+        $listContent = $this->generateList();
+        $member = $this->createMember(static::$memberData);
+
+        $this->get(\sprintf('/mailchimp/lists/%s/members/%s', $listContent['list_id'], $member->getId()));
+        $content = \json_decode($this->response->content(), true);
+
+        $this->assertResponseOk();
+
+        foreach (static::$memberData as $key => $value) {
+            self::assertArrayHasKey($key, $content);
+            self::assertEquals($value, $content[$key]);
         }
     }
 
