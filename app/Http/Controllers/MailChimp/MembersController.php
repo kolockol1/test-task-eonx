@@ -39,12 +39,13 @@ class MembersController extends Controller
      * @param string $listId
      *
      * @return JsonResponse
-     *
-     * @throws MailChimpListNotFoundException
      */
     public function create(Request $request, string $listId): JsonResponse
     {
         $list = $this->getListById($listId);
+        if (!($list instanceof MailChimpList)) {
+            return $this->getErrorResponseForListNotFound($listId);
+        }
         // Instantiate entity
         $member = new MailChimpMember($request->all());
         // Validate entity
@@ -82,11 +83,13 @@ class MembersController extends Controller
      * @param string $memberId
      *
      * @return JsonResponse
-     * @throws MailChimpListNotFoundException
      */
     public function show(string $listId, string $memberId): JsonResponse
     {
         $list = $this->getListById($listId);
+        if (!($list instanceof MailChimpList)) {
+            return $this->getErrorResponseForListNotFound($listId);
+        }
         /** @var MailChimpMember|null $member */
         $member = $this->entityManager->getRepository(MailChimpMember::class)->find($memberId);
 
@@ -103,17 +106,23 @@ class MembersController extends Controller
     /**
      * @param string $listId
      *
-     * @return MailChimpList
-     *
-     * @throws MailChimpListNotFoundException
+     * @return MailChimpList|null
      */
-    private function getListById(string $listId): MailChimpList
+    private function getListById(string $listId): ?MailChimpList
     {
-        $list = $this->entityManager->getRepository(MailChimpList::class)->find($listId);
-        if ($list === null) {
-            throw MailChimpListNotFoundException::notFoundInDatabase($listId);
-        }
+        return  $this->entityManager->getRepository(MailChimpList::class)->find($listId);
+    }
 
-        return $list;
+    /**
+     * @param string $listId
+     *
+     * @return JsonResponse
+     */
+    private function getErrorResponseForListNotFound(string $listId): JsonResponse
+    {
+        return $this->errorResponse(
+            ['message' => \sprintf('MailChimpList[%s] not found', $listId)],
+            404
+        );
     }
 }
